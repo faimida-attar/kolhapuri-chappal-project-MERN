@@ -8,94 +8,114 @@ const Product = () => {
 
   const { productId } = useParams();
   const { products, currency ,addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
+  const [productData, setProductData] = useState(null);
   const [image, setImage] = useState('')
   const [size,setSize] = useState('')
-  const fetchProductData = async () => {
-
-    products.map((item) => {
- 
-      if (item._id === productId) {
-        setProductData(item)
-        setImage(item.image[0])
-        return null;
-      }
-    })
-
-  }
 
   useEffect(() => {
-    fetchProductData();
-  }, [productId,products])
+    const product = products.find(item => item._id === productId)
+    if(product){
+      setProductData(product)
+      setImage(product.image[0])
+    }
+  }, [productId, products])
 
-  return productData ? (
-    <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>
-      {/*----------- Product Data-------------- */}
-      <div className='flex gap-12 sm:gap-12 flex-col sm:flex-row'>
+  if(!productData) return <div className='opacity-0'></div>
 
-        {/*---------- Product Images------------- */}
-        <div className='flex-1 flex flex-col-reverse gap-3 sm:flex-row'>
-          <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full'>
-              {
-                productData.image.map((item,index)=>(
-                  <img onClick={()=>setImage(item)} src={item} key={index} className='w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer' alt="" />
-                ))
-              }
+  return (
+    <div className='border-t-2 pt-10 transition-opacity ease-in duration-500'>
+
+      {/* -------- Product Details -------- */}
+      <div className='flex flex-col md:flex-row gap-12'>
+
+        {/* Product Images */}
+        <div className='flex flex-col md:flex-row gap-4 md:gap-6'>
+          
+          {/* Thumbnail Images */}
+          <div className='flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible'>
+            {productData.image.map((img, i) => (
+              <img 
+                key={i}
+                onClick={() => setImage(img)}
+                src={img} 
+                className={`cursor-pointer rounded-md border hover:scale-105 transition-transform duration-300 ${image === img ? 'border-purple-600' : 'border-gray-200'}`} 
+                alt=""
+              />
+            ))}
           </div>
-          <div className='w-full sm:w-[80%]'>
-              <img className='w-full h-auto' src={image} alt="" />
+
+          {/* Main Image */}
+          <div className='flex-1 flex justify-center items-center'>
+            <img src={image} alt="" className='w-full max-w-md rounded-xl shadow-lg hover:scale-105 transition-transform duration-300' />
           </div>
         </div>
 
-        {/* -------- Product Info ---------- */}
-        <div className='flex-1'>
-          <h1 className='font-medium text-2xl mt-2'>{productData.name}</h1>
-          <div className=' flex items-center gap-1 mt-2'>
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_icon} alt="" className="w-3 5" />
-              <img src={assets.star_dull_icon} alt="" className="w-3 5" />
-              <p className='pl-2'>(122)</p>
+        {/* Product Info */}
+        <div className='flex-1 flex flex-col gap-4'>
+          <h1 className='text-2xl md:text-3xl font-semibold'>{productData.name}</h1>
+          
+          {/* Ratings */}
+          <div className='flex items-center gap-1 mt-2'>
+            {[...Array(4)].map((_, i) => <img key={i} src={assets.star_icon} alt="" className="w-4 md:w-5" />)}
+            <img src={assets.star_dull_icon} alt="" className="w-4 md:w-5" />
+            <span className='pl-2 text-gray-500'>(122 reviews)</span>
           </div>
-          <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
-          <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
-          <div className='flex flex-col gap-4 my-8'>
-              <p>Select Size</p>
-              <div className='flex gap-2'>
-                {productData.sizes.map((item,index)=>(
-                  <button onClick={()=>setSize(item)} className={`border py-2 px-4 bg-gray-100 ${item === size ? 'border-orange-500' : ''}`} key={index}>{item}</button>
-                ))}
-              </div>
+
+          <p className='text-3xl md:text-4xl font-bold mt-4'>{currency}{productData.price}</p>
+          <p className='text-gray-500 mt-2 md:w-4/5'>{productData.description}</p>
+
+          {/* Size Selection */}
+          <div className='mt-6'>
+            <p className='font-medium mb-2'>Select Size</p>
+            <div className='flex gap-2 flex-wrap'>
+              {productData.sizes.map((item, index)=>(
+                <button 
+                  key={index} 
+                  onClick={() => setSize(item)}
+                  className={`px-4 py-2 rounded-md border transition-all duration-300 ${size === item ? 'border-purple-600 bg-purple-50' : 'border-gray-300 hover:border-purple-400'}`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
           </div>
-          <button onClick={()=>addToCart(productData._id,size)} className='bg-black text-white px-8 py-3 text-sm active:bg-gray-700'>ADD TO CART</button>
-          <hr className='mt-8 sm:w-4/5' />
-          <div className='text-sm text-gray-500 mt-5 flex flex-col gap-1'>
-              <p>100% Original product.</p>
-              <p>Cash on delivery is available on this product.</p>
-              <p>Easy return and exchange policy within 7 days.</p>
+
+          {/* Add to Cart */}
+          <button 
+            onClick={()=>addToCart(productData._id,size)}
+            className='mt-6 bg-gradient-to-r from-purple-600 to-purple-400 text-white py-3 px-6 rounded-lg shadow-lg hover:from-purple-700 hover:to-purple-500 transition-all duration-300 w-full md:w-auto'
+          >
+            ADD TO CART
+          </button>
+
+          {/* Info */}
+          <div className='text-sm text-gray-500 mt-6 flex flex-col gap-1'>
+            <p>100% Original Product</p>
+            <p>Cash on delivery available</p>
+            <p>Easy returns and exchanges within 7 days</p>
           </div>
+
         </div>
       </div>
 
-      {/* ---------- Description & Review Section ------------- */}
-      <div className='mt-20'>
-        <div className='flex'>
-          <b className='border px-5 py-3 text-sm'>Description</b>
-          <p className='border px-5 py-3 text-sm'>Reviews (122)</p>
+      {/* Description & Reviews */}
+      <div className='mt-16'>
+        <div className='flex border-b'>
+          <b className='px-6 py-3 text-sm border-r border-gray-300 cursor-pointer'>Description</b>
+          <p className='px-6 py-3 text-sm cursor-pointer'>Reviews (122)</p>
         </div>
-        <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
-          <p>An e-commerce website is an online platform that facilitates the buying and selling of products or services over the internet. It serves as a virtual marketplace where businesses and individuals can showcase their products, interact with customers, and conduct transactions without the need for a physical presence. E-commerce websites have gained immense popularity due to their convenience, accessibility, and the global reach they offer.</p>
-          <p>E-commerce websites typically display products or services along with detailed descriptions, images, prices, and any available variations (e.g., sizes, colors). Each product usually has its own dedicated page with relevant information.</p>
+        <div className='border p-6 mt-2 text-gray-600 text-sm md:text-base rounded-lg'>
+          <p className='mb-2'>An e-commerce website is an online platform that facilitates buying and selling of products online. It serves as a virtual marketplace for businesses and individuals to showcase products and conduct transactions.</p>
+          <p>Products typically have dedicated pages with detailed descriptions, images, prices, and variations (sizes/colors). Customers can browse, select, and purchase items conveniently from home.</p>
         </div>
       </div>
 
-      {/* --------- display related products ---------- */}
-
-      <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
-
+      {/* Related Products */}
+      <div className='mt-16'>
+        <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
+      </div>
     </div>
-  ) : <div className=' opacity-0'></div>
+  )
 }
 
 export default Product

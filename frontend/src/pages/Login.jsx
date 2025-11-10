@@ -16,7 +16,6 @@ const Login = () => {
       event.preventDefault();
       try {
         if (currentState === 'Sign Up') {
-          
           const response = await axios.post(backendUrl + '/api/user/register',{name,email,password})
           if (response.data.success) {
             setToken(response.data.token)
@@ -24,9 +23,7 @@ const Login = () => {
           } else {
             toast.error(response.data.message)
           }
-
         } else {
-
           const response = await axios.post(backendUrl + '/api/user/login', {email,password})
           if (response.data.success) {
             setToken(response.data.token)
@@ -34,10 +31,7 @@ const Login = () => {
           } else {
             toast.error(response.data.message)
           }
-
         }
-
-
       } catch (error) {
         console.log(error)
         toast.error(error.message)
@@ -51,24 +45,64 @@ const Login = () => {
   },[token])
 
   return (
-    <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800'>
-        <div className='inline-flex items-center gap-2 mb-2 mt-10'>
-            <p className='prata-regular text-3xl'>{currentState}</p>
-            <hr className='border-none h-[1.5px] w-8 bg-gray-800' />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-50 to-white px-4">
+      <form 
+        onSubmit={onSubmitHandler} 
+        className='bg-white shadow-2xl rounded-2xl p-8 sm:p-12 w-full max-w-md flex flex-col gap-6 transition-transform transform hover:scale-105 duration-300'
+      >
+        <div className='text-center mb-6'>
+          <h2 className='text-3xl font-bold text-gray-800'>{currentState}</h2>
+          <p className='text-gray-500 mt-1'>{currentState === 'Login' ? 'Welcome back! Please login.' : 'Create your account and join us!'}</p>
         </div>
-        {currentState === 'Login' ? '' : <input onChange={(e)=>setName(e.target.value)} value={name} type="text" className='w-full px-3 py-2 border border-gray-800' placeholder='Name' required/>}
-        <input onChange={(e)=>setEmail(e.target.value)} value={email} type="email" className='w-full px-3 py-2 border border-gray-800' placeholder='Email' required/>
-        <input onChange={(e)=>setPasword(e.target.value)} value={password} type="password" className='w-full px-3 py-2 border border-gray-800' placeholder='Password' required/>
-        <div className='w-full flex justify-between text-sm mt-[-8px]'>
-            <p className=' cursor-pointer'>Forgot your password?</p>
-            {
-              currentState === 'Login' 
-              ? <p onClick={()=>setCurrentState('Sign Up')} className=' cursor-pointer'>Create account</p>
-              : <p onClick={()=>setCurrentState('Login')} className=' cursor-pointer'>Login Here</p>
-            }
+
+        {currentState === 'Sign Up' && (
+          <input 
+            onChange={(e)=>setName(e.target.value)} 
+            value={name} 
+            type="text" 
+            className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition duration-300' 
+            placeholder='Full Name' 
+            required
+          />
+        )}
+
+        <input 
+          onChange={(e)=>setEmail(e.target.value)} 
+          value={email} 
+          type="email" 
+          className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition duration-300' 
+          placeholder='Email' 
+          required
+        />
+        <input 
+          onChange={(e)=>setPasword(e.target.value)} 
+          value={password} 
+          type="password" 
+          className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition duration-300' 
+          placeholder='Password' 
+          required
+        />
+
+        <div className='flex justify-between text-sm text-purple-600'>
+          {currentState === 'Login' 
+            ? <p onClick={()=>setCurrentState('Sign Up')} className='cursor-pointer hover:underline'>Create Account</p>
+            : <p onClick={()=>setCurrentState('Login')} className='cursor-pointer hover:underline'>Login Here</p>
+          }
+          <p className='cursor-pointer hover:underline'>Forgot Password?</p>
         </div>
-        <button className='bg-black text-white font-light px-8 py-2 mt-4'>{currentState === 'Login' ? 'Sign In' : 'Sign Up'}</button>
-    </form>
+
+        <button 
+          type="submit"
+          className='bg-gradient-to-r from-purple-600 to-purple-400 text-white font-medium py-3 rounded-xl shadow-lg hover:from-purple-800 hover:to-purple-500 transition-all duration-300'
+        >
+          {currentState === 'Login' ? 'Sign In' : 'Sign Up'}
+        </button>
+
+        <div className='text-center text-gray-400 mt-4 text-sm'>
+          © 2025 Kolhapuri Chappal. All rights reserved.
+        </div>
+      </form>
+    </div>
   )
 }
 
